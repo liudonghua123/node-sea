@@ -1,0 +1,23 @@
+{
+  "name": "node-sea",
+  "version": "0.1.0",
+  "main": "src/index.js",
+  "bin": {
+    "node-sea": "src/bin.js"
+  },
+  "type": "module",
+  "repository": "git@github.com:liudonghua123/node-sea.git",
+  "author": "liudonghua123 <liudonghua123@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node src/bin.js"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "debug": "^4.3.4",
+    "figlet": "^1.7.0",
+    "ncc": "^0.3.6",
+    "postject": "^1.0.0-alpha.6"
+  }
+}
