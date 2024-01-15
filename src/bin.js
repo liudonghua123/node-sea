@@ -3,7 +3,7 @@ import { Command } from "commander";
 import figlet from "figlet";
 import { stat } from "fs/promises";
 import package_json from "../package.json" assert {type: "json"};
-import { join, dirname } from "path";
+import { join, dirname, resolve } from "path";
 import { fileURLToPath } from 'url';
 import sea from "./index.js";
 import debug from 'debug';
@@ -28,6 +28,9 @@ async function main() {
     .option("--use-code-cache", "Use code cache", false)
     .parse(process.argv);
   const options = program.opts();
+  // Normalize the paths if they are relative
+  options.entry = resolve(process.cwd(), options.entry);
+  options.output = resolve(process.cwd(), options.output);
   // Check if entry is specified
   if (!((await stat(options.entry)).isFile())) {
     console.error(chalk.red(`Entry path ${options.entry} does not exist`));
