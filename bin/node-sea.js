@@ -7,7 +7,7 @@ import { stat } from "fs/promises";
 import package_json from "../package.json" assert {type: "json"};
 import { join, dirname, resolve } from "path";
 import { fileURLToPath } from 'url';
-import sea from "./index.js";
+import sea from "../lib/index.js";
 import debug from 'debug';
 
 const log = debug('app');

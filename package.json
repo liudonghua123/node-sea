@@ -1,16 +1,16 @@
 {
   "name": "node-sea",
   "version": "0.1.0",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "bin": {
-    "node-sea": "src/bin.js"
+    "node-sea": "bin/node-sea.js"
   },
   "type": "module",
   "repository": "git@github.com:liudonghua123/node-sea.git",
   "author": "liudonghua123 <liudonghua123@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "node src/bin.js"
+    "start": "node bin/node-sea.js"
   },
   "dependencies": {
     "chalk": "^5.3.0",
