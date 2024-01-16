@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { Command } from "commander";
 import figlet from "figlet";
 import package_json from "../package.json" assert {type: "json"};
-import { join, dirname, resolve, basename } from "path";
+import { join, dirname, resolve, basename, normalize } from "path";
 import { fileURLToPath } from 'url';
 import sea from "../lib/index.js";
 import debug from 'debug';
@@ -43,19 +43,18 @@ async function main() {
     process.exit(1);
   }
   // Config the default output path if not specified
+  const filename = basename(options.entry);
+  let output = options.output;
   if (!options.output) {
-    const filename = basename(options.entry);
-    const output = join(dirname(options.entry), `${filename.substring(0, filename.lastIndexOf('.'))}${process.platform === "win32" ? ".exe" : ""}`);
+    output = join(dirname(options.entry), `${filename.substring(0, filename.lastIndexOf('.'))}${process.platform === "win32" ? ".exe" : ""}`);
     console.info(chalk.yellow(`Output path not specified, save single executable to ${output}`));
-    options.output = output;
   }
   // Check if output is a directory and exists, if so, append the entry filename and executable extension
   if (await is_directory_exists(options.output)) {
-    const filename = basename(options.entry);
-    const output = join(options.output, `${filename.substring(0, filename.lastIndexOf('.'))}${process.platform === "win32" ? ".exe" : ""}`);
+    output = join(options.output, `${filename.substring(0, filename.lastIndexOf('.'))}${process.platform === "win32" ? ".exe" : ""}`);
     console.info(chalk.yellow(`Output path is a directory, save single executable to ${output}`));
-    options.output = output;
   }
+  options.output = resolve(process.cwd(), output);
   await sea(options.entry, options.output, {
     disableExperimentalSEAWarning: options.disableExperimentalSeaWarning,
     useSnapshot: options.useSnapshot,
