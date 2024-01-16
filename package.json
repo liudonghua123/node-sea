@@ -1,6 +1,6 @@
 {
   "name": "@liudonghua123/node-sea",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "main": "lib/index.js",
   "bin": {
     "node-sea": "bin/node-sea.js"
