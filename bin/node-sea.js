@@ -1,7 +1,7 @@
 #!/usr/bin/env node --no-warnings=ExperimentalWarning
 
 import chalk from "chalk";
-import { Command } from "commander";
+import { Command, Option } from "commander";
 import figlet from "figlet";
 import package_json from "../package.json" assert {type: "json"};
 import { join, dirname, resolve, basename, normalize } from "path";
@@ -25,10 +25,14 @@ async function main() {
     .description("Create single executable application (SEA) from entry script")
     .option("-e, --entry <path>", "Path to the javascript entry script", join(__dirname, "../examples/hello.js"))
     .option("-o, --output <path>", "Path to the output executable, supports relative or absolute file/directory path, defaults to the same filename executable aside the entry script", '')
-    .option("--disable-experimental-sea-warning", "Disable experimental SEA warning", true)
-    .option("--use-snapshot", "Use snapshot", false)
-    .option("--use-code-cache", "Use code cache", false)
-    .parse(process.argv);
+    .option("-d, --disable-experimental-sea-warning", "Disable experimental SEA warning", true)
+    .option("-s, --use-snapshot", "Use snapshot", false)
+    .option("-c, --use-code-cache", "Use code cache", false)
+    .option("-n, --use-system-node", "Use system node", false)
+    .option("-v, --node-version <version>", "Node version for create SEA", 'v20.11.0')
+    .option("-a, --arch <arch>", "Node arch for create SEA", 'x64')
+  program.addOption(new Option("-i, --with-intl <intl>", "Node intl feature").choices(['none', 'small-icu', 'full-icu']).default('small-icu'))
+  program.parse(process.argv);
   const options = program.opts();
   // Normalize the entry path
   options.entry = resolve(process.cwd(), options.entry);
@@ -58,7 +62,11 @@ async function main() {
   await sea(options.entry, options.output, {
     disableExperimentalSEAWarning: options.disableExperimentalSeaWarning,
     useSnapshot: options.useSnapshot,
-    useCodeCache: options.useCodeCache
+    useCodeCache: options.useCodeCache,
+    useSystemNode: options.useSystemNode,
+    nodeVersion: options.nodeVersion,
+    withIntl: options.withIntl,
+    arch: options.arch,
   })
 }
 
