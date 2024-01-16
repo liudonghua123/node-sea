@@ -1,0 +1,146 @@
+name: Node Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      node_tag:
+        description: 'The tag of node to build'
+        required: true
+        default: v20.11.0
+  push:
+    tags:
+      - 'node'
+
+permissions: write-all
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        with-intl: [none, small-icu, full-icu]
+        include:
+          # linux
+          - os: ubuntu-latest
+            with-intl: none
+            platform: linux
+            arch: x64
+          # - os: ubuntu-latest
+          #   with-intl: system-icu
+          #   platform: linux
+          #   arch: x64
+          - os: ubuntu-latest
+            with-intl: small-icu
+            platform: linux
+            arch: x64
+          - os: ubuntu-latest
+            with-intl: full-icu
+            platform: linux
+            arch: x64
+          # macos
+          - os: macos-latest
+            with-intl: none
+            platform: macos
+            arch: x64
+          # - os: macos-latest
+          #   with-intl: system-icu
+          #   platform: macos
+          #   arch: x64
+          - os: macos-latest
+            with-intl: small-icu
+            platform: macos
+            arch: x64
+          - os: macos-latest
+            with-intl: full-icu
+            platform: macos
+            arch: x64
+          # windows
+          - os: windows-latest
+            with-intl: none
+            platform: windows
+            arch: x64
+          # - os: windows-latest
+          #   with-intl: system-icu
+          #   platform: windows
+          #   arch: x64
+          - os: windows-latest
+            with-intl: small-icu
+            platform: windows
+            arch: x64
+          - os: windows-latest
+            with-intl: full-icu
+            platform: windows
+            arch: x64
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Checkout node for building
+      run: |
+        # when triggered by push, node_tag is empty, so use default tag
+        tag_name=${{ github.event.inputs.node_tag }}; if [ -z $tag_name ]; then tag_name='v20.11.0'; fi
+        echo "tag_name=$tag_name" >> "$GITHUB_ENV"
+        git clone -b $tag_name https://github.com/nodejs/node.git
+        cd node
+        git status
+        git branch
+        git log -1
+    - name: Install ubuntu deps
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt update -y
+        sudo apt install -y build-essential python3 python3-pip make libicu-dev
+    - name: Install macos deps
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew update
+        brew install icu4c pkg-config make
+    - name: Install windows deps
+      if: matrix.os == 'windows-latest'
+      run: |
+        choco upgrade chocolatey -y
+        choco install nasm
+    - name: Initialization for ${{ env.tag_name }} ...
+      run: |
+        echo ok!
+    - name: Building ...
+      if: matrix.os != 'windows-latest'
+      run: |
+        ./configure --with-intl=${{ matrix.with-intl }} 
+        make -j$(nproc)
+      working-directory: node
+    - name: Building ...
+      if: matrix.os == 'windows-latest'
+      run: |
+        # if with-intl is none, then use intl-none as build argument
+        intl=${{ matrix.with-intl }}
+        if [ "${intl}" == "none" ]; then
+          intl=intl-none
+        fi
+        ./vcbuild.bat ${{ matrix.arch }} ltcg ${intl}
+      working-directory: node
+    - name: Inspecting ...
+      run: |
+        ls -lR out
+      working-directory: node
+    - name: Prepare on windows ...
+      if: matrix.os != 'windows-latest'
+      run: |
+        cp node/out/Release/node node-${{ matrix.platform }}-${{ matrix.arch }}-${{ env.tag_name }}-with-intl-${{ matrix.with-intl }}
+    - name: Prepare on ubuntu ...
+      if: matrix.os == 'windows-latest'
+      run: |
+        cp node/out/Release/node.exe node-${{ matrix.platform }}-${{ matrix.arch }}-${{ env.tag_name }}-with-intl-${{ matrix.with-intl }}.exe
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: node-*
+        tag_name: node
+        release_name: node
+        
+        
