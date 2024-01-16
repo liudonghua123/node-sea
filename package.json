@@ -10,7 +10,7 @@
   "author": "liudonghua123 <liudonghua123@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "node bin/node-sea.js"
+    "start": "node --no-warnings=ExperimentalWarning bin/node-sea.js"
   },
   "dependencies": {
     "chalk": "^5.3.0",
