@@ -16,10 +16,15 @@ It's a simple tool which build js as a single executable for easy deploying.
 2. `import sea from "@liudonghua123/node-sea";`
 3. invoke [`sea`](https://github.com/liudonghua123/node-sea/blob/main/lib/index.js) function just like [`node-sea.js`](https://github.com/liudonghua123/node-sea/blob/main/bin/node-sea.js).
 
+## Example usage
+
+[![asciicast](https://asciinema.org/a/631593.svg)](https://asciinema.org/a/631593)
+
 ## ToDos
 
-- [ ] add github ci action for building node with [intl](https://nodejs.org/api/intl.html) customization.
-- [ ] config the node binary used when create sea to reduce the size of executable.
+- [x] add github ci action for building node with [intl](https://nodejs.org/api/intl.html) customization.
+- [x] config the node binary used when create sea to reduce the size of executable.
+- [ ] add ncc build feature.
 
 ## License
 
