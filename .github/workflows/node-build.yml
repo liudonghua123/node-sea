@@ -108,14 +108,24 @@ jobs:
     - name: Initialization for ${{ env.tag_name }} ...
       run: |
         echo ok!
-    - name: Building ...
-      if: matrix.os != 'windows-latest'
+    - name: Building for linux ...
+      if: startsWith(matrix.os, 'ubuntu')
       run: |
         ./configure --with-intl=${{ matrix.with-intl }} 
         make -j$(nproc)
       working-directory: node
-    - name: Building ...
-      if: matrix.os == 'windows-latest'
+    - name: Building for macos ...
+      if: startsWith(matrix.os, 'macos')
+      run: |
+        # https://github.com/memkind/memkind/issues/33#issuecomment-540614162
+        echo "macos: sysctl -n hw.physicalcpu: $(sysctl -n hw.physicalcpu)"
+        echo "macos: sysctl -n hw.logicalcpu: $(sysctl -n hw.logicalcpu)"
+        echo "macos: getconf _NPROCESSORS_ONLN: $(getconf _NPROCESSORS_ONLN)"
+        ./configure --with-intl=${{ matrix.with-intl }} 
+        make -j$(getconf _NPROCESSORS_ONLN)
+      working-directory: node
+    - name: Building for windows ...
+      if: startsWith(matrix.os, 'windows')
       run: |
         # if with-intl is none, then use intl-none as build argument
         intl=${{ matrix.with-intl }}
