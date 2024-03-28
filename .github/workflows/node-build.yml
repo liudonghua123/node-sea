@@ -99,7 +99,7 @@ jobs:
       if: startsWith(matrix.os, 'macos')
       run: |
         brew update
-        brew install icu4c pkg-config make
+        HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 brew install icu4c pkg-config make
     - name: Install windows deps
       if: startsWith(matrix.os, 'windows')
       run: |
