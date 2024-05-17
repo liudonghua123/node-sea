@@ -93,6 +93,12 @@ jobs:
     - name: Install ubuntu deps
       if: startsWith(matrix.os, 'ubuntu')
       run: |
+        ls /usr/bin/gcc*
+        sudo update-alternatives --list gcc || true
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
+        sudo update-alternatives --list gcc || true
+        gcc -v
         sudo apt update -y
         sudo apt install -y build-essential python3 python3-pip make libicu-dev
     - name: Install macos deps
