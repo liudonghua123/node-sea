@@ -108,9 +108,11 @@ async function main() {
     .option("-e, --entry <path>", "Path to the javascript entry script", join(__dirname, "../examples/hello.js"))
     .option("-o, --output <path>", "Path to the output executable, supports relative or absolute file/directory path, defaults to the same filename executable aside the entry script", '')
     .option("-d, --disable-experimental-sea-warning", "Disable experimental SEA warning", true)
+    .option("--no-disable-experimental-sea-warning", "Disable experimental SEA warning")
     .option("-s, --use-snapshot", "Use snapshot", false)
     .option("-c, --use-code-cache", "Use code cache", false)
     .option("-n, --use-system-node", "Use system node", true)
+    .option("--no-use-system-node", "Use system node")
     .option("-v, --node-version <version>", "Node version for create SEA", 'v20.11.0')
     .option("-a, --arch <arch>", "Node arch for create SEA", 'x64')
     .option("-i, --with-intl <intl>", "Node intl feature, accept values: none, small-icu, full-icu", 'small-icu')
@@ -129,7 +131,7 @@ async function main() {
     });
 
   program.parse();
-  console.log('options', options);
+  log('options', options);
   // Check if ls command is specified
   if (options.ls) {
     await listPrebuildNode(options.ls.available);
