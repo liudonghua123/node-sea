@@ -113,11 +113,11 @@ async function main() {
     .option("-n, --use-system-node", "Use system node", false)
     .option("-v, --node-version <version>", "Node version for create SEA", 'v20.11.0')
     .option("-a, --arch <arch>", "Node arch for create SEA", 'x64')
+    .option("-i, --with-intl <intl>", "Node intl feature, accept values: none, small-icu, full-icu", 'small-icu')
     .action((_options) => {
       log('default command options', options);
       options = { build: _options };
     });
-    program.addOption(new Option("-i, --with-intl <intl>", "Node intl feature").choices(['none', 'small-icu', 'full-icu']).default('small-icu'))
 
   // add a ls sub command, and with an optional `--available` option.
   program.command('ls')
@@ -129,7 +129,7 @@ async function main() {
     });
 
   program.parse();
-  log('options', options);
+  console.log('options', options);
   // Check if ls command is specified
   if (options.ls) {
     await listPrebuildNode(options.ls.available);
