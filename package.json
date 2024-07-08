@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "chalk": "^5.3.0",
+    "cli-table3": "^0.6.5",
     "commander": "^11.1.0",
     "debug": "^4.3.4",
     "figlet": "^1.7.0",
@@ -40,5 +41,9 @@
   "engines": {
     "node": ">=20"
   },
-  "os": ["win32", "linux", "darwin"]
+  "os": [
+    "win32",
+    "linux",
+    "darwin"
+  ]
 }
