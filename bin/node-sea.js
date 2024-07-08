@@ -110,7 +110,7 @@ async function main() {
     .option("-d, --disable-experimental-sea-warning", "Disable experimental SEA warning", true)
     .option("-s, --use-snapshot", "Use snapshot", false)
     .option("-c, --use-code-cache", "Use code cache", false)
-    .option("-n, --use-system-node", "Use system node", false)
+    .option("-n, --use-system-node", "Use system node", true)
     .option("-v, --node-version <version>", "Node version for create SEA", 'v20.11.0')
     .option("-a, --arch <arch>", "Node arch for create SEA", 'x64')
     .option("-i, --with-intl <intl>", "Node intl feature, accept values: none, small-icu, full-icu", 'small-icu')
