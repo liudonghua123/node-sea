@@ -1,6 +1,6 @@
 {
   "name": "@liudonghua123/node-sea",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "It's a simple tool which build js as a single executable for easy deploying.",
   "keywords": [
     "node",
