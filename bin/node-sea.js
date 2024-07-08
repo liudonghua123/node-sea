@@ -98,9 +98,11 @@ async function listPrebuildNode(available) {
 async function main() {
   // Print the banner
   console.log(chalk.blue(figlet.textSync("node-sea")));
+  let options = {};
   // Parse the command line arguments
   const program = new Command();
   program
+    .command('build', { isDefault: true })
     .version(package_json.version)
     .description("Create single executable application (SEA) from entry script")
     .option("-e, --entry <path>", "Path to the javascript entry script", join(__dirname, "../examples/hello.js"))
@@ -111,58 +113,61 @@ async function main() {
     .option("-n, --use-system-node", "Use system node", false)
     .option("-v, --node-version <version>", "Node version for create SEA", 'v20.11.0')
     .option("-a, --arch <arch>", "Node arch for create SEA", 'x64')
+    .action((_options) => {
+      log('default command options', options);
+      options = { build: _options };
+    });
+    program.addOption(new Option("-i, --with-intl <intl>", "Node intl feature").choices(['none', 'small-icu', 'full-icu']).default('small-icu'))
 
   // add a ls sub command, and with an optional `--available` option.
-  const command = {};
   program.command('ls')
-    .description('List available prebuild intl customization node binaries')
-    .option("--available", "List available prebuild binaries in the remote repository", false)
-    .action((subOptions) => {
-      command.ls = true,
-        command.available = subOptions.available
+    .description("List available prebuild intl customization node binaries")
+    .option("-a, --available", "List available prebuild binaries in the remote repository", false)
+    .action((_options) => {
+      log('ls command options', options);
+      options = { ...options, ls: { available: _options.available } }
     });
 
-  program.addOption(new Option("-i, --with-intl <intl>", "Node intl feature").choices(['none', 'small-icu', 'full-icu']).default('small-icu'))
-  program.parse(process.argv);
-  const options = program.opts();
+  program.parse();
+  log('options', options);
   // Check if ls command is specified
-  if (command.ls) {
-    await listPrebuildNode(command.available);
+  if (options.ls) {
+    await listPrebuildNode(options.ls.available);
     process.exit(0);
   }
   // Normalize the entry path
-  options.entry = resolve(process.cwd(), options.entry);
+  options.build.entry = resolve(process.cwd(), options.build.entry);
   // Check if entry file is specified and exists
-  if (!(await is_file_exists(options.entry))) {
-    console.error(chalk.red(`Entry path ${options.entry} does not exist`));
+  if (!(await is_file_exists(options.build.entry))) {
+    console.error(chalk.red(`Entry path ${options.build.entry} does not exist`));
     process.exit(1);
   }
   // Check if entry is javascript file, ends with .js or .mjs
-  if (!basename(options.entry).split('.').pop()?.endsWith('js')) {
-    console.error(chalk.red(`Entry path ${options.entry} is not a javascript file`));
+  if (!basename(options.build.entry).split('.').pop()?.endsWith('js')) {
+    console.error(chalk.red(`Entry path ${options.build.entry} is not a javascript file`));
     process.exit(1);
   }
   // Config the default output path if not specified
-  const filename = basename(options.entry);
-  let output = options.output;
-  if (!options.output) {
-    output = join(dirname(options.entry), `${filename.substring(0, filename.lastIndexOf('.'))}${process.platform === "win32" ? ".exe" : ""}`);
+  const filename = basename(options.build.entry);
+  let output = options.build.output;
+  if (!options.build.output) {
+    output = join(dirname(options.build.entry), `${filename.substring(0, filename.lastIndexOf('.'))}${process.platform === "win32" ? ".exe" : ""}`);
     console.info(chalk.yellow(`Output path not specified, save single executable to ${output}`));
   }
   // Check if output is a directory and exists, if so, append the entry filename and executable extension
-  if (await is_directory_exists(options.output)) {
-    output = join(options.output, `${filename.substring(0, filename.lastIndexOf('.'))}${process.platform === "win32" ? ".exe" : ""}`);
+  if (await is_directory_exists(options.build.output)) {
+    output = join(options.build.output, `${filename.substring(0, filename.lastIndexOf('.'))}${process.platform === "win32" ? ".exe" : ""}`);
     console.info(chalk.yellow(`Output path is a directory, save single executable to ${output}`));
   }
-  options.output = resolve(process.cwd(), output);
-  await sea(options.entry, options.output, {
-    disableExperimentalSEAWarning: options.disableExperimentalSeaWarning,
-    useSnapshot: options.useSnapshot,
-    useCodeCache: options.useCodeCache,
-    useSystemNode: options.useSystemNode,
-    nodeVersion: options.nodeVersion,
-    withIntl: options.withIntl,
-    arch: options.arch,
+  options.build.output = resolve(process.cwd(), output);
+  await sea(options.build.entry, options.build.output, {
+    disableExperimentalSEAWarning: options.build.disableExperimentalSeaWarning,
+    useSnapshot: options.build.useSnapshot,
+    useCodeCache: options.build.useCodeCache,
+    useSystemNode: options.build.useSystemNode,
+    nodeVersion: options.build.nodeVersion,
+    withIntl: options.build.withIntl,
+    arch: options.build.arch,
   })
 }
 
