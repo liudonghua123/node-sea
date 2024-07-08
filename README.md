@@ -18,7 +18,7 @@ It's a simple tool which build js as a single executable for easy deploying.
 
 ## Example usage
 
-[![asciicast](https://asciinema.org/a/631593.svg)](https://asciinema.org/a/631593)
+[![asciicast](./demo.gif)](https://asciinema.org/a/667221)
 
 ## ToDos
 
