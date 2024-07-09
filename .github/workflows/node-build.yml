@@ -110,10 +110,32 @@ jobs:
       if: startsWith(matrix.os, 'windows')
       run: |
         choco upgrade chocolatey -y
-        choco install nasm
+        choco install nasm vswhere
     - name: Initialization for ${{ env.tag_name }} ...
       run: |
         echo ok!
+    - name: Install Visual Studio 2022 Community 17.9.7.0
+      if: startsWith(matrix.os, 'windows')
+      run: |
+        # https://github.com/actions/runner-images/issues/9154
+        choco upgrade visualstudio2022enterprise
+        # https://community.chocolatey.org/packages/visualstudio2022community/117.9.7.0
+        choco install visualstudio2022community --version=117.9.7.0
+        # https://community.chocolatey.org/packages/visualstudio2022buildtools/117.9.7.0
+        choco install visualstudio2022buildtools --version=117.9.7.0
+        # https://github.com/nodejs/node/blob/main/tools/bootstrap/windows_boxstarter#L21C15-L21C48
+        # choco install visualstudio2022-workload-vctools -y --params="--add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.VC.ATL.ARM64"
+    - name: Disable the default VS2022 Enterprise 
+      if: startsWith(matrix.os, 'windows')
+      run: |
+        move "C:\Program Files\Microsoft Visual Studio\2022\Enterprise" "C:\Program Files\Microsoft Visual Studio\2022\Enterprise.default"
+      shell: cmd
+    - name: Checking VS product path ...
+      if: startsWith(matrix.os, 'windows')
+      continue-on-error: true
+      run: |
+        vswhere -products * -requires Microsoft.Component.MSBuild -property installationPath
+      shell: cmd
     - name: Building for linux ...
       if: startsWith(matrix.os, 'ubuntu')
       run: |
@@ -133,13 +155,20 @@ jobs:
     - name: Building for windows ...
       if: startsWith(matrix.os, 'windows')
       run: |
-        # if with-intl is none, then use intl-none as build argument
-        intl=${{ matrix.with-intl }}
-        if [ "${intl}" == "none" ]; then
-          intl=intl-none
-        fi
-        ./vcbuild.bat ${{ matrix.arch }} ltcg ${intl}
+        set DEBUG_HELPER=1 
+        @REM set VSINSTALLDIR=C:\Program Files\Microsoft Visual Studio\2022\Community\
+        @REM call "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat"
+        @REM call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64
+        @REM call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\\Auxiliary\Build\vcvarsall.bat" amd64
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat"
+        @REM if with-intl is none, then use intl-none as build argument
+        set intl=${{ matrix.with-intl }}
+        if "%intl%" == "none" (
+          set intl=intl-none
+        )
+        .\vcbuild.bat ${{ matrix.arch }} ltcg %intl%
       working-directory: node
+      shell: cmd
     - name: Inspecting ...
       run: |
         ls -lR out
