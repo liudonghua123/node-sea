@@ -114,6 +114,22 @@ jobs:
     - name: Initialization for ${{ env.tag_name }} ...
       run: |
         echo ok!
+    - name: Release some disk spaces for macos build, remove old xcode versions ...
+      if: startsWith(matrix.os, 'macos')
+      run: |
+        echo "Disk spaces before cleanup"
+        sudo df -h
+        sudo du -sh /*
+        echo "Searching for Xcode versions:"
+        find /Applications -name "Xcode_*" -maxdepth 1 -mindepth 1
+        # https://github.com/actions/runner-images/issues/2840#issuecomment-2334584217
+        echo "Remove all but the latest Xcode..."
+        find /Applications/ -name "Xcode*" | sort -r | tail --lines=+2 | xargs rm -rf
+        echo "Available Xcode versions after removal:"
+        find /Applications -name "Xcode_*" -maxdepth 1 -mindepth 1
+        echo "Disk spaces after cleanup"
+        sudo df -h
+        sudo du -sh /*
     - name: Building for linux ...
       if: startsWith(matrix.os, 'ubuntu')
       run: |
