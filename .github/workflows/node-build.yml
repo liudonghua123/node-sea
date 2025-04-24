@@ -23,23 +23,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         with-intl: [none, small-icu, full-icu]
         include:
           # linux
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
             with-intl: none
             platform: linux
             arch: x64
-          # - os: ubuntu-20.04
+          # - os: ubuntu-latest
           #   with-intl: system-icu
           #   platform: linux
           #   arch: x64
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
             with-intl: small-icu
             platform: linux
             arch: x64
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
             with-intl: full-icu
             platform: linux
             arch: x64
@@ -94,10 +94,10 @@ jobs:
       if: startsWith(matrix.os, 'ubuntu')
       run: |
         ls /usr/bin/gcc*
-        sudo update-alternatives --list gcc || true
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
-        sudo update-alternatives --list gcc || true
+        # sudo update-alternatives --list gcc || true
+        # sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
+        # sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
+        # sudo update-alternatives --list gcc || true
         gcc -v
         sudo apt update -y
         sudo apt install -y build-essential python3 python3-pip make libicu-dev
