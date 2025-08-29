@@ -3,7 +3,7 @@
 import chalk from "chalk";
 import { Command, Option } from "commander";
 import figlet from "figlet";
-import package_json from "../package.json" assert {type: "json"};
+import package_json from "../package.json" with {type: "json"};
 import { join, dirname, resolve, basename, normalize } from "path";
 import { fileURLToPath } from 'url';
 import sea from "../lib/index.js";
